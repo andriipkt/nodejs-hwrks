@@ -2,7 +2,17 @@ const { Contact } = require("../../models");
 const { HttpError, ctrlWrapper } = require("../../helpers");
 
 const getAll = async (req, res) => {
-  const result = await Contact.find();
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 20, favorite } = req.query;
+
+  const skip = (page - 1) * limit;
+
+  const filter = { owner };
+  if (favorite !== undefined) {
+    filter.favorite = favorite;
+  }
+
+  const result = await Contact.find(filter, "", { skip, limit });
   res.json(result);
 };
 
@@ -11,15 +21,15 @@ const getById = async (req, res) => {
   const result = await Contact.findById(contactId);
 
   if (!result) {
-    throw HttpError(404, "Not Found");
+    throw HttpError(404);
   }
 
   res.json(result);
 };
 
 const addNew = async (req, res) => {
-  console.log("req.user", req.user);
-  const result = await Contact.create(req.body);
+  const { _id: owner } = req.user;
+  const result = await Contact.create({ ...req.body, owner });
   res.status(201).json(result);
 };
 
@@ -28,7 +38,7 @@ const deleteContact = async (req, res) => {
   const result = await Contact.findByIdAndDelete(contactId);
 
   if (!result) {
-    throw HttpError(404, "Not Found");
+    throw HttpError(404);
   }
 
   res.json({
@@ -44,8 +54,9 @@ const updateContact = async (req, res) => {
   });
 
   if (!result) {
-    throw HttpError(404, "Not Found");
+    throw HttpError(404);
   }
+
   res.json(result);
 };
 
@@ -57,7 +68,7 @@ const updateFavorite = async (req, res) => {
   });
 
   if (!result) {
-    throw HttpError(404, "Not Found");
+    throw HttpError(404);
   }
   res.json(result);
 };
