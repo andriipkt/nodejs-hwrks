@@ -12,7 +12,7 @@ const getAll = async (req, res) => {
     filter.favorite = favorite;
   }
 
-  const result = await Contact.find(filter, "", { skip, limit });
+  const result = await Contact.find(filter, "-owner", { skip, limit });
   res.json(result);
 };
 

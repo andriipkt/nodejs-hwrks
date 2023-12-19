@@ -17,12 +17,12 @@ router.post(
   authControllers.logIn
 );
 
-router.get("/users/current", authenticate, authControllers.getCurrent);
-
 router.post("/logout", authenticate, authControllers.logOut);
 
+router.get("/current", authenticate, authControllers.getCurrent);
+
 router.patch(
-  "/users",
+  "/subscription",
   authenticate,
   validateBody(userSchemas.updateSubscriptionSchema),
   authControllers.updateSubscription
